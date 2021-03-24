@@ -1,0 +1,250 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "storageAccounts_stcbezwe02_name": {
+            "defaultValue": "stcbezwe02",
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2021-01-01",
+            "name": "[parameters('storageAccounts_stcbezwe02_name')]",
+            "location": "westeurope",
+            "sku": {
+                "name": "Standard_LRS",
+                "tier": "Standard"
+            },
+            "kind": "StorageV2",
+            "properties": {
+                "azureFilesIdentityBasedAuthentication": {
+                    "directoryServiceOptions": "AD",
+                    "activeDirectoryProperties": {
+                        "domainName": "LAB.BEZENCON.NET",
+                        "netBiosDomainName": "LAB",
+                        "forestName": "LAB.BEZENCON.NET",
+                        "domainGuid": "d78d0a7f-bc3e-4968-85c0-eaa93ae49c7e",
+                        "domainSid": "S-1-5-21-3008965818-413914850-1220325161",
+                        "azureStorageSid": "S-1-5-21-3008965818-413914850-1220325161-2112"
+                    }
+                },
+                "minimumTlsVersion": "TLS1_2",
+                "allowBlobPublicAccess": true,
+                "largeFileSharesState": "Enabled",
+                "networkAcls": {
+                    "bypass": "AzureServices",
+                    "virtualNetworkRules": [],
+                    "ipRules": [],
+                    "defaultAction": "Deny"
+                },
+                "supportsHttpsTrafficOnly": true,
+                "encryption": {
+                    "services": {
+                        "file": {
+                            "keyType": "Account",
+                            "enabled": true
+                        },
+                        "blob": {
+                            "keyType": "Account",
+                            "enabled": true
+                        }
+                    },
+                    "keySource": "Microsoft.Storage"
+                },
+                "accessTier": "Hot"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices",
+            "apiVersion": "2021-01-01",
+            "name": "[concat(parameters('storageAccounts_stcbezwe02_name'), '/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_stcbezwe02_name'))]"
+            ],
+            "sku": {
+                "name": "Standard_LRS",
+                "tier": "Standard"
+            },
+            "properties": {
+                "cors": {
+                    "corsRules": []
+                },
+                "deleteRetentionPolicy": {
+                    "enabled": false
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/fileServices",
+            "apiVersion": "2021-01-01",
+            "name": "[concat(parameters('storageAccounts_stcbezwe02_name'), '/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_stcbezwe02_name'))]"
+            ],
+            "sku": {
+                "name": "Standard_LRS",
+                "tier": "Standard"
+            },
+            "properties": {
+                "protocolSettings": {
+                    "smb": {}
+                },
+                "cors": {
+                    "corsRules": []
+                },
+                "shareDeleteRetentionPolicy": {
+                    "enabled": true,
+                    "days": 14
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/inventoryPolicies",
+            "apiVersion": "2021-01-01",
+            "name": "[concat(parameters('storageAccounts_stcbezwe02_name'), '/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_stcbezwe02_name'))]"
+            ],
+            "properties": {
+                "policy": {
+                    "enabled": true,
+                    "type": "Inventory",
+                    "destination": "myfirstinventory",
+                    "rules": [
+                        {
+                            "enabled": true,
+                            "name": "DefaultRule-AllBlobs",
+                            "definition": {
+                                "filters": {
+                                    "blobTypes": [
+                                        "blockBlob",
+                                        "appendBlob",
+                                        "pageBlob"
+                                    ]
+                                }
+                            }
+                        },
+                        {
+                            "enabled": true,
+                            "name": "test01",
+                            "definition": {
+                                "filters": {
+                                    "blobTypes": [
+                                        "blockBlob",
+                                        "pageBlob",
+                                        "appendBlob"
+                                    ]
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/privateEndpointConnections",
+            "apiVersion": "2021-01-01",
+            "name": "[concat(parameters('storageAccounts_stcbezwe02_name'), '/', parameters('storageAccounts_stcbezwe02_name'), '.5b3ee71c-d4a7-4755-b3ae-f6ed1dfe9c50')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_stcbezwe02_name'))]"
+            ],
+            "properties": {
+                "provisioningState": "Succeeded",
+                "privateEndpoint": {},
+                "privateLinkServiceConnectionState": {
+                    "status": "Approved",
+                    "description": "Auto-Approved",
+                    "actionRequired": "None"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/privateEndpointConnections",
+            "apiVersion": "2021-01-01",
+            "name": "[concat(parameters('storageAccounts_stcbezwe02_name'), '/', parameters('storageAccounts_stcbezwe02_name'), '.f6649c24-a57a-4b7f-9ca8-152c298736f0')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_stcbezwe02_name'))]"
+            ],
+            "properties": {
+                "provisioningState": "Succeeded",
+                "privateEndpoint": {},
+                "privateLinkServiceConnectionState": {
+                    "status": "Approved",
+                    "description": "Auto-Approved",
+                    "actionRequired": "None"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/queueServices",
+            "apiVersion": "2021-01-01",
+            "name": "[concat(parameters('storageAccounts_stcbezwe02_name'), '/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_stcbezwe02_name'))]"
+            ],
+            "properties": {
+                "cors": {
+                    "corsRules": []
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/tableServices",
+            "apiVersion": "2021-01-01",
+            "name": "[concat(parameters('storageAccounts_stcbezwe02_name'), '/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_stcbezwe02_name'))]"
+            ],
+            "properties": {
+                "cors": {
+                    "corsRules": []
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+            "apiVersion": "2021-01-01",
+            "name": "[concat(parameters('storageAccounts_stcbezwe02_name'), '/default/myfirstinventory')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccounts_stcbezwe02_name'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_stcbezwe02_name'))]"
+            ],
+            "properties": {
+                "defaultEncryptionScope": "$account-encryption-key",
+                "denyEncryptionScopeOverride": false,
+                "publicAccess": "None"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/fileServices/shares",
+            "apiVersion": "2021-01-01",
+            "name": "[concat(parameters('storageAccounts_stcbezwe02_name'), '/default/demo')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/fileServices', parameters('storageAccounts_stcbezwe02_name'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_stcbezwe02_name'))]"
+            ],
+            "properties": {
+                "accessTier": "Cool",
+                "shareQuota": 1024,
+                "enabledProtocols": "SMB"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/fileServices/shares",
+            "apiVersion": "2021-01-01",
+            "name": "[concat(parameters('storageAccounts_stcbezwe02_name'), '/default/wvd-profiles')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/fileServices', parameters('storageAccounts_stcbezwe02_name'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_stcbezwe02_name'))]"
+            ],
+            "properties": {
+                "accessTier": "TransactionOptimized",
+                "shareQuota": 20,
+                "enabledProtocols": "SMB"
+            }
+        }
+    ]
+}
